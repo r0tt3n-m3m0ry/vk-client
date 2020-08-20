@@ -3,6 +3,7 @@ try:
 except:
     print('Установите необходимые модули через команду \'$ pip3 install -r requirements.txt\' перед запуском скрипта.'); exit()
 
+import time
 import os
 
 def clear_screen():
@@ -10,22 +11,39 @@ def clear_screen():
 
 clear_screen()
 
-while True:
-    login = input('VK login: ')
-    password = input('VK password: ')
+try:
+    while True:
+        try:
+            vk_session = vk_api.VkApi(login=input('VK login: '), password=input('VK password: '), app_id='2685278', auth_handler = lambda: [input('VK 2FA code: '), False])
+            vk_session.auth()
+        except vk_api.exceptions.LoginRequired:
+            print('Логин не может быть пустым!')
+        except vk_api.exceptions.PasswordRequired:
+            print('Пароль не может быть пустым!')
+        except vk_api.exceptions.BadPassword:
+            print('Неверный пароль!')
+        else:
+            print('Вы в VK!'); time.sleep(1.25); break
 
-    try:
-        vk_session = vk_api.VkApi(login, password, app_id='2685278', auth_handler = lambda: [input('VK 2FA code: '), False])
-        vk_session.auth()
-    except vk_api.exceptions.LoginRequired:
-        print('Логин не может быть пустым!')
-    except vk_api.exceptions.PasswordRequired:
-        print('Пароль не может быть пустым!')
-    except vk_api.exceptions.BadPassword:
-        print('Неверный пароль!')
+    vk = vk_session.get_api()
+    
+    clear_screen()
+
+    account_info = vk.account.getProfileInfo()
+    
+    print(f"Добро пожаловать, {account_info['first_name']} {account_info['last_name']}! :D\nВаш статус - {vk.status.get()['text']}")
+
+    if input('Хотите его изменить? (Д/Н) > ').lower() == 'д':
+        try:
+            vk.status.set(text=input('Введите текст для нового статуса: '))
+        except:
+            print('Статус не был изменен!')
+        else:
+            print('Статус установлен!')
     else:
-        print('Вы в VK!'); break
+        print('Ну и славно :3 Этот статус тоже неплох, ня <3')
 
-vk = vk_session.get_api()
+    print('\nДо скорого! :D')
 
-vk.wall.post(message='Hello world! :D')
+except KeyboardInterrupt:
+    print('\n\nДосвиданья >:D'); exit()
