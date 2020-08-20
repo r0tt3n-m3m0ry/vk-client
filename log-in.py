@@ -23,7 +23,7 @@ try:
         except vk_api.exceptions.BadPassword:
             print('Неверный пароль!')
         else:
-            print('Вы в VK!'); time.sleep(1.25); break
+            print('Вы в VK!'); os.remove('vk_config.v2.json'); time.sleep(1.25); break
 
     vk = vk_session.get_api()
     
