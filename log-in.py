@@ -22,8 +22,9 @@ try:
             print('Пароль не может быть пустым!')
         except vk_api.exceptions.BadPassword:
             print('Неверный пароль!')
-        except vk_api.exceptions.Captcha: # captcha
-			print('Слишком много запросов за последнее время. Подождите 5 секунд...'); time.sleep(5)
+        except vk_api.exceptions.Captcha as captcha:
+            captcha_key = input(f'Enter captcha code ({captcha.get_url()}): ')
+            captcha.try_again(captcha_key)
         else:
             print('Вы в VK!'); os.remove('vk_config.v2.json'); time.sleep(1.25); break
 
